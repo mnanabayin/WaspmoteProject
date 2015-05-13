@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WaspMote Sıcaklık Verileri</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+
+
+     <!-- <link rel="stylesheet" type="text/css" href="https://bitbucket.org/cleonello/jqplot/raw/b5a7796a9ebf/src/jquery.jqplot.css" />
+
+      <script src="https://bitbucket.org/cleonello/jqplot/raw/b5a7796a9ebf/src/jquery.jqplot.js" type="text/javascript"></script>
+      <script src="https://bitbucket.org/cleonello/jqplot/raw/b5a7796a9ebf/src/plugins/jqplot.barRenderer.js"></script>
+      <script src="https://bitbucket.org/cleonello/jqplot/raw/b5a7796a9ebf/src/plugins/jqplot.categoryAxisRenderer.js"></script>
+
+-->
+
+
+
+
+
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/jquery.jqplot.min.js"></script>
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/plugins/jqplot.canvasTextRenderer.min.js"></script>
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/plugins/jqplot.dateAxisRenderer.min.js"></script>
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/plugins/jqplot.logAxisRenderer.min.js"></script>
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+      <script type="text/javascript" src="http://localhost/HomeAutomation/JS/dist/plugins/jqplot.highlighter.min.js"></script>
+
+
+      <link rel="stylesheet" type="text/css" hrf="http://localhost/HomeAutomation/JS/dist/jquery.jqplot.min.css" />
+      <link rel="stylesheet" type="text/css" hrf="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/smoothness/jquery-ui.css" />
+
+
+      <!-- <script type="text/javascript" src="../src/plugins/jqplot.canvasTextRenderer.min.js"></script>
+       <script type="text/javascript" src="../src/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+
+
+       <script language="javascript" type="text/javascript" src="jquery.min.js"></script>
+       <script language="javascript" type="text/javascript" src="jquery.jqplot.min.js"></script>
+       <link rel="stylesheet" type="text/css" href="jquery.jqplot.css" />-->
+
+  </head>
+  <body>Grafik
+    <ul id="messages">mesajlar...</ul>
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <!--<script>
+      var socket = io();
+      /*$('form').submit(function(){
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });*/
+      socket.on('temperature', function(msg){
+        $('#messages').append($('<li>').text(msg));
+      });
+    </script>-->
+
+
+  <!----------------Grafik------------>
+  <div id="chart1" class="plot" style="width:700px;height:500px;">Çizim</div>
+
+  <script type="text/javascript">
+      var socket = io();
+      var myData = [[1,1],[2,2],[3,3],[4,4],[5,5]];
+      var counter=0;
+
+
+      $(document).ready(function() {
+          socket.on('temperature', function(msg){
+              $('#messages').html($('<li>').text(msg));
+              var x = (new Date()).getTime();
+              var y = parseFloat(msg);
+              myData.push([x, y]);
+              /*counter++;
+              if (counter<10)
+                myData.empty();*/
+            //  alert(myData);
+              /*if(counter++>10)
+                myData.;*/
+
+          });
+          var plot1 = $.jqplot('chart1', [new Array(1)], {
+              title: 'Live Random Data',
+              series: [
+                  {
+                      yaxis: 'y2axis',
+                      label: '',
+                      showMarker: false,
+                      fill: false,
+                      neighborThreshold: 3,
+                      lineWidth: 2.2,
+                      color: '#0571B6',
+                      fillAndStroke: true}
+              ],
+              axes: {
+                  xaxis: {
+                      renderer: $.jqplot.DateAxisRenderer,
+                      tickOptions: {
+                          formatString: '%H:%M:%S'
+                      },
+                      numberTicks: 10
+                  },
+                  y2axis: {
+                      min: 100,
+                      max: 150,
+                      tickOptions: {
+                          formatString: '%.2f'
+                      },
+                      numberTicks: 15
+                  }
+              },
+              cursor: {
+                  zoom: false,
+                  showTooltip: false,
+                  show: false
+              },
+              highlighter: {
+                  useAxesFormatters: false,
+                  showMarker: false,
+                  show: false
+              },
+              grid: {
+                  gridLineColor: '#333333',
+                  background: 'transparent',
+                  borderWidth: 1
+              }
+          });
+
+          //var myData = [];
+          var x = (new Date()).getTime() - 101000;
+          var y;
+          var i;
+          /*for ( i = 0; i < 10; i++) {
+              x += 1000;
+              y = Math.floor(Math.random() * 100);
+              myData.push([x, y]);
+          }*/
+
+          plot1.series[0].data = myData;
+          plot1.resetAxesScale();
+          plot1.axes.xaxis.numberTicks = 10;
+          plot1.axes.y2axis.numberTicks = 15;
+          plot1.replot();
+
+          function updateSeries() {
+              myData.splice(0, 1);
+             /*x = (new Date()).getTime();
+              y = Math.floor(Math.random() * 100);
+              myData.push([x, y]);*/
+
+              plot1.series[0].data = myData;
+              plot1.resetAxesScale();
+              plot1.axes.xaxis.numberTicks = 10;
+              plot1.axes.y2axis.numberTicks = 15;
+              plot1.replot();
+          }
+
+          window.setInterval(updateSeries, 2000);
+
+
+
+      });
+
+
+
+  </script>
+
+
+
+
+  </body>
+</html>
