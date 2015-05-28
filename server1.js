@@ -5,7 +5,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 
-
 var monk = require("monk"); // a framework that makes accessing MongoDb really easy
 
 /*
@@ -18,17 +17,16 @@ var SerialPort = require("serialport").SerialPort;
 
 var dateFormat = require('dateformat');
 
-
-//var express = require('express');
-//var app = express();
 // configurations
-//http.use(app.static('JS'));
-app.use(express.static('JS'));
+
+
 /*
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 */
+
+app.use(express.static('JS'));
 
 var serialPort = new SerialPort("/dev/ttyUSB0", {
     baudrate: 115200,
@@ -40,15 +38,10 @@ should.exists(db);
 var collection = db.get("Acceleration");
 should.exists(collection);
 
-/*var router = express.Router();
-// Tüm istekler için kök dizin
-app.use('/RestAPI', router);*/
 
 // index.html dosyası istemcilere gönderiliyor...
-
 app.get('/', function(req, res){
-    console.log('burası');
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index1.html');
 });
 
 
@@ -61,16 +54,12 @@ http.listen(port, function(){
 
 
 
-
+//Web Socket
 
 io.on('connection', function(socket)
 {
     console.log('Bir kullanıcı bağlandı');
 
-    /*for(var i = 0; i < 50; i++)
-    {
-        io.emit('temperature', i);
-    }*/
     socket.on('disconnect', function()
     {
         console.log('Kullanıcı ayrıldı...');
@@ -78,7 +67,7 @@ io.on('connection', function(socket)
 });
 
 
-
+//Serial Port Operations
 
 serialPort.on("open", function ()
 {
@@ -93,7 +82,7 @@ serialPort.on("open", function ()
 
         var x=dataArray[0];
         // Tüm istemcilere gönder
-        io.emit('temperature', x);
+        io.emit('acceleration', data);
 
         // MongoDB ye kaydet...
         collection.insert({"time":dateFormat(date.getTime(), "yyyy-mm-dd HH:MM:ss"), "x": dataArray[0],"y": dataArray[1],"z": dataArray[2] }, function(err, doc)
