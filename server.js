@@ -1,3 +1,6 @@
+////gelen x, değerleri için (2000) doğrusal grafik çiziyor.
+
+
 //Dependencies
 var express = require('express');
 var app= express();

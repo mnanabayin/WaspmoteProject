@@ -1,4 +1,10 @@
+//gelen x,y,z değerleri için (2000) doğrusal grafik çiziyor.
+
+//gelen x,y,z değerleri için (200) text tabanlı  çiziyor.
+
+
 //Dependencies
+
 var express = require('express');
 var app= express();
 var http = require('http').Server(app);
@@ -26,7 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 */
 
-app.use(express.static('JS'));
+app.use(express.static('JPh     S'));
 
 var serialPort = new SerialPort("/dev/ttyUSB0", {
     baudrate: 115200,
@@ -41,7 +47,8 @@ should.exists(collection);
 
 // index.html dosyası istemcilere gönderiliyor...
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/index1.html');
+   // res.sendFile(__dirname + '/index11.html'); //doğrusal grafik
+    res.sendFile(__dirname + '/index12.html'); //metin tabanlı grafik
 });
 
 
